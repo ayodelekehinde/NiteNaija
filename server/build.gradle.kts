@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.sheetsdb)
     implementation(libs.jsoup)
 
+    //Tests
     testImplementation(libs.server.test)
     testImplementation(libs.test)
     testImplementation(libs.client.test)
