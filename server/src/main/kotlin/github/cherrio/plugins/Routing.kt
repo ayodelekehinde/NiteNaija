@@ -8,15 +8,9 @@ import io.ktor.server.response.*
 import io.ktor.server.request.*
 
 fun Application.configureRouting() {
-    install(StatusPages) {
-        exception<Throwable> { call, cause ->
-            call.respondText(text = "500: $cause", status = HttpStatusCode.InternalServerError)
-        }
-    }
-
     routing {
         get("/") {
-            call.respondText("Hello World!")
+            call.respondText("Hello NiteNaija app on RAILWAY")
         }
     }
 }

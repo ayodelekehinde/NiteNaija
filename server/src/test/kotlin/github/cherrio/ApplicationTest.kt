@@ -24,7 +24,7 @@ class ApplicationTest {
         }
         client.get("/").apply {
             assertEquals(HttpStatusCode.OK, status)
-            assertEquals("Hello World!", bodyAsText())
+            assertEquals("Hello NiteNaija app on RAILWAY", bodyAsText())
         }
     }
 }
