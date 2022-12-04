@@ -39,5 +39,6 @@ dependencies {
     testImplementation(libs.server.test)
     testImplementation(libs.test)
     testImplementation(libs.client.test)
+    testImplementation(libs.coroutine.test)
 
 }
