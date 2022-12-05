@@ -25,6 +25,7 @@ dependencies {
     implementation(libs.server.json)
     implementation(libs.server.netty)
     implementation(libs.log4j)
+    implementation(libs.ecache)
 
     //Client
     implementation(libs.client.core)

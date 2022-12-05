@@ -38,6 +38,7 @@ dependencyResolutionManagement {
             library("server-json","io.ktor","ktor-serialization-kotlinx-json-jvm").versionRef("ktor")
             library("server-netty","io.ktor","ktor-server-netty-jvm").versionRef("ktor")
             library("log4j","ch.qos.logback:logback-classic:1.2.11")
+            library("ecache","org.ehcache:ehcache:3.10.1")
 
             //Tests
             library("server-test","io.ktor","ktor-server-tests-jvm").versionRef("ktor")
