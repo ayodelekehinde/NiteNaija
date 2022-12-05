@@ -40,6 +40,10 @@ dependencyResolutionManagement {
             library("log4j","ch.qos.logback:logback-classic:1.2.11")
             library("ecache","org.ehcache:ehcache:3.10.1")
 
+            library("orbit","org.orbit-mvi:orbit-core:4.4.0")
+            library("koin","io.insert-koin:koin-core:3.2.2")
+            library("voyager-navigation","cafe.adriel.voyager:voyager-navigator:1.0.0-rc03")
+
             //Tests
             library("server-test","io.ktor","ktor-server-tests-jvm").versionRef("ktor")
             library("test","org.jetbrains.kotlin:kotlin-test-junit:1.7.22")
@@ -49,4 +53,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "NiteNaija"
 include(":server")
+include(":desktop")
 
