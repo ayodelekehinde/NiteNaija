@@ -43,6 +43,7 @@ dependencyResolutionManagement {
             library("orbit","org.orbit-mvi:orbit-core:4.4.0")
             library("koin","io.insert-koin:koin-core:3.2.2")
             library("voyager-navigation","cafe.adriel.voyager:voyager-navigator:1.0.0-rc03")
+            library("splitpane","org.jetbrains.compose.components:components-splitpane-desktop:1.2.1")
 
             //Tests
             library("server-test","io.ktor","ktor-server-tests-jvm").versionRef("ktor")

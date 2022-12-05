@@ -34,6 +34,7 @@ kotlin {
                 implementation(libs.voyager.navigation)
                 implementation(libs.koin)
                 implementation(libs.orbit)
+                implementation(libs.splitpane)
 
                 implementation(libs.jsoup)
             }
