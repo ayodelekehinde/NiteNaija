@@ -65,5 +65,5 @@ fun panelItems(icon: ImageVector, text: String, onClick: () -> Unit) {
     }
 }
 
-private fun Modifier.cursorForItemClick(): Modifier =
+fun Modifier.cursorForItemClick(): Modifier =
     pointerHoverIcon(PointerIcon(Cursor(Cursor.HAND_CURSOR)))

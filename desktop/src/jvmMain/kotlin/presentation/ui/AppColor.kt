@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 val DARK = Color(0xFF1A1A1B)
 val BLACK = Color(0xFF000000)
 val DARK_L = Color(0xFF191A19)
+val TRANSPARENT_BLACK = Color(0x8C000000)
 
 val darkColors = darkColors(
     primary = Color.White,

@@ -1,44 +1,66 @@
 
 package presentation.home
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
-import org.jetbrains.compose.splitpane.SplitPaneScope
 import org.jetbrains.compose.splitpane.SplitPaneState
 import org.jetbrains.compose.splitpane.VerticalSplitPane
+import presentation.details.MovieDetailsScreen
 import presentation.ui.BLACK
 import presentation.ui.DARK_L
 
 @OptIn(ExperimentalSplitPaneApi::class)
 @Composable
 fun FullPane(
-    splitterState: SplitPaneState
+    splitterState: SplitPaneState,
+    viewModel: HomeViewModel
 ){
     var text by remember { mutableStateOf("") }
+    val state = viewModel.container.stateFlow.collectAsState().value
+    val minHeight = if (state.isMovieDetails) 0 else 80
+
+    LaunchedEffect(Unit){
+        viewModel.getTitles()
+    }
     VerticalSplitPane(splitPaneState = splitterState) {
-        first(80.dp) {
+        first(minHeight.dp) {
             Top(text){ text = it}
         }
         second(20.dp) {
-            MovieListScreen(DrawerType.HOME)
+            when{
+                state.loading -> {
+                    Box(Modifier.fillMaxSize().background(DARK_L)) {
+                        CircularProgressIndicator(Modifier.size(50.dp).align(Alignment.Center), color = Color.White)
+                    }
+                }
+                !state.loading && state.titles != null && !state.isMovieDetails->{
+                    MovieListScreen(DrawerType.HOME, state.titles){
+                        viewModel.openMovieDetails(it)
+                    }
+                }
+                state.isMovieDetails && state.movie != null -> {
+                    MovieDetailsScreen(viewModel = viewModel, movie = state.movie){
+                        viewModel.back()
+                    }
+                }
+            }
+
         }
     }
 }
-
 @Composable
 private fun Top(text: String, onChange: (String) -> Unit = {}){
     Column(Modifier.background(DARK_L).fillMaxSize()) {
