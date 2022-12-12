@@ -15,10 +15,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.singleWindowApplication
+import data.remote.Movie
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.SplitPaneState
 import org.jetbrains.compose.splitpane.VerticalSplitPane
 import presentation.details.MovieDetailsScreen
+import presentation.player.VideoPlayerComponent
 import presentation.ui.BLACK
 import presentation.ui.DARK_L
 
@@ -26,7 +29,8 @@ import presentation.ui.DARK_L
 @Composable
 fun FullPane(
     splitterState: SplitPaneState,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    onPlay: (Movie) -> Unit
 ){
     var text by remember { mutableStateOf("") }
     val state = viewModel.container.stateFlow.collectAsState().value
@@ -46,15 +50,23 @@ fun FullPane(
                         CircularProgressIndicator(Modifier.size(50.dp).align(Alignment.Center), color = Color.White)
                     }
                 }
-                !state.loading && state.titles != null && !state.isMovieDetails->{
+                !state.loading && state.titles != null && !state.isMovieDetails && !state.isMoviePlaying ->{
                     MovieListScreen(DrawerType.HOME, state.titles){
                         viewModel.openMovieDetails(it)
                     }
                 }
                 state.isMovieDetails && state.movie != null -> {
-                    MovieDetailsScreen(viewModel = viewModel, movie = state.movie){
-                        viewModel.back()
-                    }
+                    MovieDetailsScreen(
+                        viewModel = viewModel,
+                        movie = state.movie,
+                        onBack = {viewModel.back()},
+                        onPlay = {
+                            viewModel.playMovie(it)
+                        }
+                    )
+                }
+                state.isMoviePlaying ->{
+                    onPlay(state.movie!!)
                 }
             }
 

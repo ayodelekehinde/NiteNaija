@@ -39,6 +39,10 @@ class HomeViewModel(
         }
     }
 
+    fun playMovie(movie: Movie) = intent {
+        reduce { state.copy(isMoviePlaying = true, movie = movie, isMovieDetails = false) }
+    }
+
     companion object: KoinComponent{
         fun getViewModel() = getKoin().get<HomeViewModel>()
     }
@@ -50,5 +54,6 @@ data class HomeState(
     val titles: Map<String, List<Movie>>? = null,
     val isMovieDetails: Boolean = false,
     val movie: Movie? = null,
-    val isDetailsLoading: Boolean = false
+    val isDetailsLoading: Boolean = false,
+    val isMoviePlaying: Boolean = false
 )

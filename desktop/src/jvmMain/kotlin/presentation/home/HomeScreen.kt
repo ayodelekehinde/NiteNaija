@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberWindowState
 import cafe.adriel.voyager.core.screen.Screen
+import data.remote.Movie
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
@@ -19,7 +20,9 @@ import presentation.ui.BLACK
 @OptIn(ExperimentalSplitPaneApi::class)
 @Preview
 @Composable
-fun DrawerPane() {
+fun DrawerPane(
+    onPlay: (Movie) -> Unit
+) {
     val splitterState = rememberSplitPaneState(moveEnabled = false)
     val hSplitterState = rememberSplitPaneState()
     val windowState = rememberWindowState()
@@ -33,7 +36,7 @@ fun DrawerPane() {
             SidePane(width)
         }
         second(50.dp) {
-            FullPane(splitterState, homeViewModel)
+            FullPane(splitterState, homeViewModel, onPlay = onPlay)
         }
     }
 }

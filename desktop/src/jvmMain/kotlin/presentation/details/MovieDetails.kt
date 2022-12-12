@@ -38,7 +38,8 @@ fun MovieDetailsScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
     viewModel: HomeViewModel,
     movie: Movie,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onPlay: (Movie) -> Unit
 ){
     val state = viewModel.container.stateFlow.collectAsState().value
     LaunchedEffect(Unit){
@@ -81,7 +82,10 @@ fun MovieDetailsScreen(
             }
             Row(modifier = Modifier.padding(top = 40.dp),horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Button(
-                    onClick = {},
+                    onClick = {
+                      onPlay(state.movie!!)
+                    },
+                    enabled = !state.isDetailsLoading,
                     shape = RoundedCornerShape(5.dp),
                     modifier = Modifier.size(height = 40.dp, width = 120.dp).cursorForItemClick(),
                     elevation = ButtonDefaults.elevation(5.dp)

@@ -44,7 +44,8 @@ dependencyResolutionManagement {
             library("koin","io.insert-koin:koin-core:3.2.2")
             library("voyager-navigation","cafe.adriel.voyager:voyager-navigator:1.0.0-rc03")
             library("splitpane","org.jetbrains.compose.components:components-splitpane-desktop:1.2.1")
-
+            library("vlcj","uk.co.caprica:vlcj:4.7.3")
+            library("vlcj-subs","uk.co.caprica:vlcj-subs:0.2.0")
             //Tests
             library("server-test","io.ktor","ktor-server-tests-jvm").versionRef("ktor")
             library("test","org.jetbrains.kotlin:kotlin-test-junit:1.7.22")

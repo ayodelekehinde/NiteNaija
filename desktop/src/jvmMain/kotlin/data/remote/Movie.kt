@@ -1,6 +1,7 @@
 package data.remote
 
 import kotlinx.serialization.Serializable
+import presentation.player.Subtitle
 
 @Serializable
 data class Movie(
@@ -13,7 +14,8 @@ data class Movie(
     val releaseDate: String = "",
     val stars: String = "",
     val downloadUrl: String = "",
-    val streamingUrl: String = ""
+    val streamingUrl: String = "",
+    val subtitleUrl: String = ""
 )
 
 enum class MovieType{

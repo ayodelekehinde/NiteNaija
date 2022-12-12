@@ -54,15 +54,15 @@ class MovieDataSource(private val clientEngine: HttpClientEngine) {
     }
 
      suspend fun getDownloadUrl(url: String): String{
-        val response = client.get("$url/download"){
+        val response = client.get(url){
             headers {
                 append("referer", url)
             }
         }
-        return response.request.url.toString()
+        return getStreamingUrl(response.request.url.toString())
     }
 
-     suspend fun getStreamingUrl(url: String): String{
+     private suspend fun getStreamingUrl(url: String): String{
         val fileId = getFileIdFromUrl(url)
         val response = client.get("https://api.sabishare.com/token/download/$fileId").body<StreamingData>()
         return response.data.url

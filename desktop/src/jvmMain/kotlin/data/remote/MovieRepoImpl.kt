@@ -13,4 +13,10 @@ class MovieRepoImpl(
     override suspend fun getTitleDetails(movie: Movie): Result<Movie> {
         return movieDataSource.getMovieDetails(movie)
     }
+
+    override suspend fun getStreamUrl(url: String): String {
+        return movieDataSource.getDownloadUrl(url)
+    }
+
+
 }

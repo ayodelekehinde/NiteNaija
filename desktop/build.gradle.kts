@@ -34,6 +34,8 @@ kotlin {
                 implementation(libs.koin)
                 implementation(libs.orbit)
                 implementation(libs.splitpane)
+                implementation(libs.vlcj)
+                implementation(libs.vlcj.subs)
 
                 implementation(libs.jsoup)
             }
