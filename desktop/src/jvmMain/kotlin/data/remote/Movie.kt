@@ -16,9 +16,18 @@ data class Movie(
     val downloadUrl: String = "",
     val streamingUrl: String = "",
     val subtitleUrl: String = ""
-)
+){
+    fun isComplete() = summary.isNotEmpty() && streamingUrl.isNotEmpty()
+
+}
 
 enum class MovieType{
     HOLLYWOOD, NOLLYWOOD, YORUBA, SERIES
 }
+
+
+@Serializable
+data class Series(
+    val seasons: Pair<String, List<Movie>>
+)
 

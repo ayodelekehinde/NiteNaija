@@ -9,12 +9,10 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ImageInfo
-import org.koin.core.time.TimeInMillis
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
@@ -26,13 +24,11 @@ import uk.co.caprica.vlcj.player.embedded.videosurface.VideoSurfaceAdapters
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormatCallback
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.format.RV32BufferFormat
-import uk.co.caprica.vlcj.subs.handler.SpuHandler
-import uk.co.caprica.vlcj.subs.parser.SrtParser
-import java.io.InputStreamReader
 import java.net.URL
 import java.nio.ByteBuffer
-import java.security.Timestamp
 import java.util.*
+import java.util.logging.Level
+import java.util.logging.Logger
 import javax.swing.JComponent
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -53,15 +49,16 @@ fun VideoPlayer(
     val windowState = rememberWindowState().size
     NativeDiscovery().discover()
     var imageBitmap by remember { mutableStateOf(ImageBitmap(windowState.width.value.toInt(), windowState.height.value.toInt())) }
-    Image(modifier = modifier.background(Color.Black), bitmap = imageBitmap, contentDescription = "Video")
     val mediaPlayerComponent = rememberMediaPlayerComponent()
     var subs by remember { mutableStateOf(emptyList<Subtitle>()) }
 
     subUrl?.let {
         LaunchedEffect(subUrl) {
+            println("Getting subs")
             subs = parseSub(it)
         }
     }
+    Image(modifier = modifier.background(Color.Black), bitmap = imageBitmap, contentDescription = "Video")
 
     DisposableEffect(Unit) {
         var byteArray: ByteArray? = null
@@ -94,7 +91,6 @@ fun VideoPlayer(
             VideoSurfaceAdapters.getVideoSurfaceAdapter(),
         )
         mediaPlayer.videoSurface().set(callbackVideoSurface)
-        mediaPlayer.media().play(url)
         mediaPlayer.events().addMediaPlayerEventListener(object : MediaPlayerEventAdapter() {
 
             override fun mediaPlayerReady(mediaPlayer: MediaPlayer) {
@@ -131,6 +127,7 @@ fun VideoPlayer(
                 println("Error occurred")
             }
         })
+        mediaPlayer.media().play(url)
         onDispose {
             mediaPlayer.release()
         }
@@ -199,39 +196,42 @@ private fun String.getSeconds(): String{
 }
 private suspend fun parseSub(url: String): List<Subtitle>{
     val subtitleList = mutableListOf<Subtitle>()
-    val subs = withContext(Dispatchers.IO) { URL(url).openStream() }.reader()
-    subs.useLines {
-        var index: Long? = null
-        var begin: TimeStamp? = null
-        var end: TimeStamp? = null
-        var text: String? = null
+    return withContext(Dispatchers.IO) {
+        val reader = URL(url).openStream().reader()
+        reader.useLines {
+            var index: Long? = null
+            var begin: TimeStamp? = null
+            var end: TimeStamp? = null
+            var text: String? = null
 
-        for (line in it.map { line -> line.trim() }){
-            if (line.isNotEmpty()) {
-                when {
-                    (index == null) -> index = line.toLongOrNull()
-                    (begin == null) -> {
-                        val timestamps = line.split(" --> ")
+            for (line in it.map { line -> line.trim() }){
+                if (line.isNotEmpty()) {
+                    when {
+                        (index == null) -> index = line.toLongOrNull()
+                        (begin == null) -> {
+                            val timestamps = line.split(" --> ")
 
-                        if (timestamps.size != 2) {
-                            return@useLines
+                            if (timestamps.size != 2) {
+                                return@useLines
+                            }
+                            begin = parseTimestamp(timestamps[0].trim())
+                            end = parseTimestamp(timestamps[1].trim())
                         }
-                        begin = parseTimestamp(timestamps[0].trim())
-                        end = parseTimestamp(timestamps[1].trim())
+                        (text == null) -> text = line
+                        else -> text += "\n$line"
                     }
-                    (text == null) -> text = line
-                    else -> text += "\n$line"
+                } else if (text != null) {
+                    subtitleList.add(Subtitle(index!!, begin!!, end!!, text))
+                    index = null
+                    begin = null
+                    end = null
+                    text = null
                 }
-            } else if (text != null) {
-                subtitleList.add(Subtitle(index!!, begin!!, end!!, text))
-                index = null
-                begin = null
-                end = null
-                text = null
             }
         }
+        println(subtitleList.first())
+        subtitleList.toList()
     }
-    return subtitleList.toList()
 }
 
 private fun isMacOS(): Boolean {

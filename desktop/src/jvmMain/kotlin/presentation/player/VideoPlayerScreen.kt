@@ -2,6 +2,8 @@ package presentation.player
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -31,7 +33,8 @@ data class PlayState(
 fun VideoPlayerComponent(
     modifier: Modifier = Modifier,
     url: String,
-    subUrl: String? = null
+    subUrl: String? = null,
+    onBack: () -> Unit = {}
 ){
     val scope = rememberCoroutineScope()
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
@@ -76,6 +79,12 @@ fun VideoPlayerComponent(
                     currentSub = it
             }
         )
+        IconButton(
+            onClick = onBack,
+            modifier = Modifier.size(50.dp).align(Alignment.TopStart).cursorForItemClick()
+        ){
+            Icon(Icons.Filled.ArrowBack, contentDescription = "back_videoScreen", tint = Color.White)
+        }
         Text(
             currentSub,
             color = Color.White,

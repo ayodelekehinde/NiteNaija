@@ -1,0 +1,2 @@
+-keep class sun.misc.Unsafe { *; }
+-dontnote sun.misc.Unsafe

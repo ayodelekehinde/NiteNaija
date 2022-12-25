@@ -36,6 +36,7 @@ class MovieDataSource(private val clientEngine: HttpClientEngine) {
         val yoruba = async{ getMovie("videos/yoruba/page/$page").getOrElse { emptyList() } }
         awaitAll(hollywood,nollywood,series,yoruba).flatten()
     }
+    suspend fun getMovieByOption(url: String) = getMovie(url).getOrElse { emptyList() }
 
     suspend fun getMovieDetails(movie: Movie) =  kotlin.runCatching{
         val response = client.get(movie.url).bodyAsText()
@@ -51,6 +52,28 @@ class MovieDataSource(private val clientEngine: HttpClientEngine) {
         }else{
             movie.copy(summary = parsed[0].text())
         }
+    }
+
+    suspend fun getSeriesDetails(url: String) =  coroutineScope{
+        val response = client.get(url).bodyAsText()
+        val seasons = Jsoup.parse(response).select(".video-seasons .vs-one")
+            .map {
+                val seasonName = it.text()
+                val episodeLink =  it.select("a").attr("href")
+                Pair(first = seasonName, second = episodeLink)
+            }
+        val series = seasons.map {
+            async { getMovie(it.second, isSeries = true) }
+        }.awaitAll()
+        return@coroutineScope seasons.mapIndexed { index, pair ->
+            val season = series.get(index).getOrElse { emptyList() }
+            Series(Pair(pair.first, season))
+        }
+    }
+
+    private suspend fun getEpisodes(url: String){
+        val response = client.get(url).bodyAsText()
+        val episodes = Jsoup.parse(response)
     }
 
      suspend fun getDownloadUrl(url: String): String{
@@ -78,13 +101,12 @@ class MovieDataSource(private val clientEngine: HttpClientEngine) {
         else -> MovieType.YORUBA
     }
 
-    private suspend fun getMovie(url: String): Result<List<Movie>>  = kotlin.runCatching{
-        println("Started: $url")
+    private suspend fun getMovie(url: String, isSeries: Boolean = false): Result<List<Movie>>  = kotlin.runCatching{
         val response = client.get(url).bodyAsText()
         val parsedData = Jsoup.parse(response).select(".file-one")
          parsedData.map {
             val nameAndImageElement = it.select("img")
-            val name = nameAndImageElement.attr("title")
+            val name = if (isSeries) it.select(".title").text() else nameAndImageElement.attr("title")
             val image = nameAndImageElement.attr("src")
             val movieUrl = it.select("a").attr("href")
             Movie(name, movieUrl, image, getGenre(url))

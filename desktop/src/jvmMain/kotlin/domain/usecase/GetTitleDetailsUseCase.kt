@@ -1,6 +1,7 @@
 package domain.usecase
 
 import data.remote.Movie
+import data.remote.Series
 import domain.repo.MovieRepo
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -20,5 +21,13 @@ class GetTitleDetailsUseCase(
                 Result.failure(Throwable("An error occurred"))
             }
         }
+    }
+    suspend fun getSeriesDetails(movie: Movie): Result<List<Series>>{
+        val response = movieRepo.getSeriesDetails(movie.url)
+       return if (response.isNotEmpty()){
+            Result.success(response)
+        }else{
+            Result.failure(Throwable("An error occurred"))
+       }
     }
 }

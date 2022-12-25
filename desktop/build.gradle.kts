@@ -18,7 +18,7 @@ repositories {
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "11"
+            kotlinOptions.jvmTarget = "17"
         }
         withJava()
     }
@@ -54,9 +54,23 @@ compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "desktop"
+            modules("java.instrument", "java.management", "jdk.unsupported")
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe)
+            packageName = "NiteFlix"
             packageVersion = "1.0.0"
+
+            macOS {
+                iconFile.set(project.file("../icons/icon.icns"))
+                dockName = "NiteFlix"
+                bundleID = "com.cherrio.niteflix"
+            }
+            windows {
+                iconFile.set(project.file("../icons/icon.ico"))
+            }
+        }
+        buildTypes.release.proguard {
+            obfuscate.set(true)
+            configurationFiles.from("rules.pro")
         }
     }
 }

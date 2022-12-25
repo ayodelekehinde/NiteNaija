@@ -1,7 +1,6 @@
 
 package presentation.home
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,30 +14,37 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.singleWindowApplication
 import data.remote.Movie
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.SplitPaneState
 import org.jetbrains.compose.splitpane.VerticalSplitPane
 import presentation.details.MovieDetailsScreen
-import presentation.player.VideoPlayerComponent
 import presentation.ui.BLACK
 import presentation.ui.DARK_L
 
 @OptIn(ExperimentalSplitPaneApi::class)
 @Composable
 fun FullPane(
+    sidePaneOptions: SidePaneOptions,
     splitterState: SplitPaneState,
-    viewModel: HomeViewModel,
+    viewModel: AppViewModel,
     onPlay: (Movie) -> Unit
 ){
+
     var text by remember { mutableStateOf("") }
     val state = viewModel.container.stateFlow.collectAsState().value
-    val minHeight = if (state.isMovieDetails) 0 else 80
+    var hideSearchBar by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit){
-        viewModel.getTitles()
+    if (sidePaneOptions != SidePaneOptions.HOME){
+        hideSearchBar = true
     }
+    val minHeight = if (state.isMovieDetails || hideSearchBar) 0 else 80
+
+
+    LaunchedEffect(sidePaneOptions){
+        viewModel.getTitles(sidePaneOptions)
+    }
+
     VerticalSplitPane(splitPaneState = splitterState) {
         first(minHeight.dp) {
             Top(text){ text = it}
@@ -51,7 +57,7 @@ fun FullPane(
                     }
                 }
                 !state.loading && state.titles != null && !state.isMovieDetails && !state.isMoviePlaying ->{
-                    MovieListScreen(DrawerType.HOME, state.titles){
+                    MovieListScreen(sidePaneOptions, state.titles){
                         viewModel.openMovieDetails(it)
                     }
                 }
