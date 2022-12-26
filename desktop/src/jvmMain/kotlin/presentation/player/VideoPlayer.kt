@@ -52,12 +52,13 @@ fun VideoPlayer(
     val mediaPlayerComponent = rememberMediaPlayerComponent()
     var subs by remember { mutableStateOf(emptyList<Subtitle>()) }
 
-    subUrl?.let {
+    if (isMacOS() && subUrl != null){
         LaunchedEffect(subUrl) {
             println("Getting subs")
-            subs = parseSub(it)
+            subs = parseSub(subUrl)
         }
     }
+
     Image(modifier = modifier.background(Color.Black), bitmap = imageBitmap, contentDescription = "Video")
 
     DisposableEffect(Unit) {

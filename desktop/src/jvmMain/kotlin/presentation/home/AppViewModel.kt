@@ -59,12 +59,10 @@ class AppViewModel(
             }
             result.onSuccess {
                 when(movie.movieType){
-                    MovieType.HOLLYWOOD -> reduce { state.copy(isDetailsLoading = false, movie = it as Movie) }
-                    MovieType.NOLLYWOOD -> TODO()
-                    MovieType.YORUBA -> TODO()
                     MovieType.SERIES -> {
                         reduce { state.copy(isDetailsLoading = false, series = it as List<Series>) }
                     }
+                    else -> reduce { state.copy(isDetailsLoading = false, movie = it as Movie) }
                 }
 
             }.onFailure {
@@ -79,10 +77,19 @@ class AppViewModel(
             MovieType.NOLLYWOOD -> TODO()
             MovieType.YORUBA -> TODO()
             MovieType.SERIES -> {
-                reduce { state.copy(isDetailsLoading = true) }
-                val response = getTitleDetailsUseCase(movie)
-                response.onSuccess {
-                    reduce { state.copy(isMoviePlaying = true, isDetailsLoading = false, movie = it, isMovieDetails = false) }
+                if (!state.isDetailsLoading) {
+                    reduce { state.copy(isDetailsLoading = true) }
+                    val response = getTitleDetailsUseCase(movie)
+                    response.onSuccess {
+                        reduce {
+                            state.copy(
+                                isMoviePlaying = true,
+                                isDetailsLoading = false,
+                                movie = it,
+                                isMovieDetails = false
+                            )
+                        }
+                    }
                 }
             }
         }
