@@ -45,5 +45,5 @@ jobs:
           files: |
             desktop/build/**/*.exe
             desktop/build/**/*.dmg
-          env:
-            GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
