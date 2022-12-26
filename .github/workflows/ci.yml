@@ -2,7 +2,8 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    tags:
+      - '*'
 
 jobs:
   release:
@@ -34,12 +35,16 @@ jobs:
         with:
           name: distributable-${{ matrix.os }}
           if-no-files-found: ignore
-          path: desktop/build/**/*.exe
+          path: |
+            desktop/build/**/*.exe
+            desktop/build/**/*.dmg
 
       - name: Release
         uses: softprops/action-gh-release@91409e712cf565ce9eff10c87a8d1b11b81757ae
         with:
-          files: desktop/build/**/*.exe
+          files: |
+            desktop/build/**/*.exe
+            desktop/build/**/*.dmg
 
 
 #        env:
