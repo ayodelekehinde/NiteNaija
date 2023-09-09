@@ -5,14 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,11 +25,32 @@ import presentation.ui.DARK_L
 
 @Composable
 fun MovieListScreen(
+    currentPage: String,
+    homeTitles: Map<String, List<Movie>>,
+    isLoadingMore: Boolean,
     sidePaneOptions: SidePaneOptions,
-    data: Map<String,List<Movie>>,
+    data: List<Movie>,
+    onLoadMore: (SidePaneOptions, Int) -> Unit,
     onClick: (Movie) -> Unit
 ) {
     //val list = listOf("Popular", "Watched", "Nollywood", "Yollywood", "Tvseries", "Hollywood", "My list")
+    val lazyState = rememberLazyGridState()
+    val isScrolledToEnd by remember(data) {
+        derivedStateOf {
+            val totalItems = data.size
+            val lastVisibleItem = lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            lastVisibleItem == totalItems //- threshold
+        }
+    }
+
+    LaunchedEffect(isScrolledToEnd, data.size){
+        if (isScrolledToEnd){
+            val page = (data.size) / 18 + 1
+            onLoadMore(sidePaneOptions, page)
+        }
+
+    }
+
     when(sidePaneOptions){
         SidePaneOptions.HOME -> {
             LazyColumn(
@@ -41,37 +59,41 @@ fun MovieListScreen(
                 verticalArrangement = Arrangement.spacedBy(40.dp)
             ) {
 
-                items(data.toList()) {
+                items(homeTitles.toList()) {
                     MovieList(it.first, it.second, onClick = onClick)
                 }
             }
         }
         else -> {
             LazyVerticalGrid(
-                GridCells.Fixed(5),
-                modifier = Modifier.fillMaxWidth()
-                    .background(color = DARK_L).padding(bottom = 10.dp),
+                state = lazyState,
+                columns = GridCells.Fixed(5),
+                modifier = Modifier.fillMaxWidth().background(color = DARK_L).padding(bottom = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                item(span = {
-                    GridItemSpan(currentLineSpan = 5)
-                }) {
+                item(span = { GridItemSpan(currentLineSpan = 5) }) {
                     Text(
-                        data.toList().first().first.uppercase(),
+                        currentPage.uppercase(),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         modifier = Modifier.padding(15.dp)
                     )
                 }
-                items(data.toList().first().second){
+                items(data, key = { it.id }){
                     MovieItem(
                       movie = it,
                         modifier = Modifier.padding(5.dp),
                         onClick = onClick
                     )
                 }
-
+                if (isLoadingMore) {
+                    item(span = { GridItemSpan(currentLineSpan = 5) }) {
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                        }
+                    }
+                }
             }
         }
     }

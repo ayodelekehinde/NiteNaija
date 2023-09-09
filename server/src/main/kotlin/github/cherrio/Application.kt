@@ -1,9 +1,11 @@
 package github.cherrio
 
+import github.cherrio.plugins.configureMonitoring
+import github.cherrio.plugins.configureRouting
+import github.cherrio.plugins.configureSerialization
+import github.cherrio.plugins.configureStatusPages
 import io.ktor.server.application.*
-import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import github.cherrio.plugins.*
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 

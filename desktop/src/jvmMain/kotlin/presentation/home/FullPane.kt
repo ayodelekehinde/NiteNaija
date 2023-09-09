@@ -56,10 +56,18 @@ fun FullPane(
                         CircularProgressIndicator(Modifier.size(50.dp).align(Alignment.Center), color = Color.White)
                     }
                 }
-                !state.loading && state.titles != null && !state.isMovieDetails && !state.isMoviePlaying ->{
-                    MovieListScreen(sidePaneOptions, state.titles){
-                        viewModel.openMovieDetails(it)
-                    }
+                !state.loading && (state.titles.isNotEmpty() || state.homeTitle.isNotEmpty()) && !state.isMovieDetails && !state.isMoviePlaying ->{
+                    MovieListScreen(
+                        currentPage = state.currentPage,
+                        homeTitles = state.homeTitle,
+                        isLoadingMore = state.isLoadingMore,
+                        sidePaneOptions,
+                        state.titles,
+                        onLoadMore = { options, page ->
+                            viewModel.loadMore(options, page)
+                        },
+                        onClick = { viewModel.openMovieDetails(it) }
+                    )
                 }
                 state.isMovieDetails && state.movie != null -> {
                     MovieDetailsScreen(

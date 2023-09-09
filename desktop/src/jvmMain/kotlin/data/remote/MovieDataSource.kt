@@ -109,7 +109,7 @@ class MovieDataSource(private val clientEngine: HttpClientEngine) {
             val name = if (isSeries) it.select(".title").text() else nameAndImageElement.attr("title")
             val image = nameAndImageElement.attr("src")
             val movieUrl = it.select("a").attr("href")
-            Movie(name, movieUrl, image, getGenre(url))
+            Movie(name = name, url =  movieUrl, image = image, getGenre(url)).addId()
         }
     }
 }

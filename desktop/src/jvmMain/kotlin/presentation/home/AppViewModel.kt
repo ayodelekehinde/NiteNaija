@@ -6,13 +6,11 @@ import data.remote.Series
 import domain.usecase.GetTitleDetailsUseCase
 import domain.usecase.GetTitlesUseCase
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import org.koin.core.component.KoinComponent
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.reduce
-import java.time.Month
 
 class AppViewModel(
     private val scope: CoroutineScope,
@@ -26,7 +24,17 @@ class AppViewModel(
          if (!state.isMovieDetails) {
              reduce { state.copy(loading = true) }
              val data = getTitlesUseCase(titleOptions = sidePaneOptions.toTitle())
-             reduce { state.copy(loading = false, titles = data) }
+             if (sidePaneOptions == SidePaneOptions.HOME){
+                 reduce { state.copy(loading = false, homeTitle = data) }
+             }else {
+                 reduce {
+                     state.copy(
+                         loading = false,
+                         titles = data[sidePaneOptions.toTitle().toString()].orEmpty(),
+                         currentPage = sidePaneOptions.toTitle().toString()
+                     )
+                 }
+             }
          }
     }
     fun openMovieDetails(movie: Movie) = intent {
@@ -102,6 +110,18 @@ class AppViewModel(
         SidePaneOptions.YOLLYWOOD -> GetTitlesUseCase.TitleOptions.YOLLYWOOD
     }
 
+    fun loadMore(options: SidePaneOptions, page: Int) = intent {
+        println("Page: $page")
+        if (!state.isMovieDetails) {
+            reduce { state.copy(isLoadingMore = true) }
+            val data = getTitlesUseCase(titleOptions = options.toTitle(), page)
+            val newMovies = state.titles + data[options.toTitle().toString()].orEmpty()
+            reduce {
+                state.copy(isLoadingMore = false, titles = newMovies, currentPage = options.toTitle().toString())
+            }
+        }
+    }
+
     companion object: KoinComponent{
         fun getViewModel() = getKoin().get<AppViewModel>()
     }
@@ -110,10 +130,13 @@ class AppViewModel(
 
 data class HomeState(
     val loading: Boolean = false,
-    val titles: Map<String, List<Movie>>? = null,
+    val titles: List<Movie> = emptyList(),
+    val homeTitle: Map<String, List<Movie>> = mapOf(),
     val isMovieDetails: Boolean = false,
     val movie: Movie? = null,
     val isDetailsLoading: Boolean = false,
     val isMoviePlaying: Boolean = false,
-    val series: List<Series> = emptyList()
+    val series: List<Series> = emptyList(),
+    val isLoadingMore: Boolean = false,
+    val currentPage: String = ""
 )

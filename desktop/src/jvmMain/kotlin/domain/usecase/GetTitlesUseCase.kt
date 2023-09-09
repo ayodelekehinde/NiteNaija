@@ -3,20 +3,15 @@ package domain.usecase
 import data.remote.Movie
 import data.remote.MovieType
 import domain.repo.MovieRepo
-import presentation.home.SidePaneOptions
 
 class GetTitlesUseCase(private val movieRepo: MovieRepo) {
 
-    suspend operator fun invoke(titleOptions: TitleOptions): Map<String, List<Movie>> {
+    suspend operator fun invoke(titleOptions: TitleOptions, page: Int = 1): Map<String, List<Movie>> {
        return when(titleOptions){
             TitleOptions.HOLLYWOOD -> {
-                val response = mutableListOf<Movie>()
-                repeat(2){
-                    val list = movieRepo.getMovie(TitleOptions.HOLLYWOOD,it+1)
-                    response.addAll(list)
-                }
+                val list = movieRepo.getMovie(TitleOptions.HOLLYWOOD, page)
                 mapOf(
-                    "Hollywood" to response,
+                    TitleOptions.HOLLYWOOD.toString() to list,
                 )
             }
             TitleOptions.HOME -> {
@@ -33,33 +28,19 @@ class GetTitlesUseCase(private val movieRepo: MovieRepo) {
                 )
             }
             TitleOptions.NOLLYWOOD -> {
-                val response = mutableListOf<Movie>()
-                repeat(2){
-                    val list = movieRepo.getMovie(TitleOptions.NOLLYWOOD,it+1)
-                    response.addAll(list)
-                }
                 mapOf(
-                    "Nollywood" to response,
+                    TitleOptions.NOLLYWOOD.toString() to movieRepo.getMovie(TitleOptions.NOLLYWOOD, page),
                 )
             }
             TitleOptions.TVSERIES -> {
-                val response = mutableListOf<Movie>()
-                repeat(2){
-                    val list = movieRepo.getMovie(TitleOptions.TVSERIES,it+1)
-                    response.addAll(list)
-                }
+                val list = movieRepo.getMovie(TitleOptions.TVSERIES, page)
                 mapOf(
-                    "Tv Series" to response,
+                    TitleOptions.TVSERIES.toString() to list,
                 )
             }
             TitleOptions.YOLLYWOOD -> {
-                val response = mutableListOf<Movie>()
-                repeat(2){
-                    val list = movieRepo.getMovie(TitleOptions.YOLLYWOOD,it+1)
-                    response.addAll(list)
-                }
                 mapOf(
-                    "Yollywood" to response,
+                    TitleOptions.YOLLYWOOD.toString() to movieRepo.getMovie(TitleOptions.YOLLYWOOD, page),
                 )
             }
         }
@@ -68,10 +49,10 @@ class GetTitlesUseCase(private val movieRepo: MovieRepo) {
 
 
     sealed interface TitleOptions{
-        object HOME: TitleOptions
-        object HOLLYWOOD: TitleOptions
-        object NOLLYWOOD: TitleOptions
-        object TVSERIES: TitleOptions
-        object YOLLYWOOD: TitleOptions
+        data object HOME: TitleOptions
+        data object HOLLYWOOD: TitleOptions
+        data object NOLLYWOOD: TitleOptions
+        data object TVSERIES: TitleOptions
+        data object YOLLYWOOD: TitleOptions
     }
 }

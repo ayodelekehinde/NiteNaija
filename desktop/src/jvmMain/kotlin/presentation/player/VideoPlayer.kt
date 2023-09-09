@@ -27,8 +27,6 @@ import uk.co.caprica.vlcj.player.embedded.videosurface.callback.format.RV32Buffe
 import java.net.URL
 import java.nio.ByteBuffer
 import java.util.*
-import java.util.logging.Level
-import java.util.logging.Logger
 import javax.swing.JComponent
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
